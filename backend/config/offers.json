@@ -1,0 +1,20 @@
+{
+  "offers": [
+    {
+      "type": "early_payment_discount",
+      "discountPct": 2,
+      "eligibleWithinDays": 3,
+      "sendOnInvoiceDay": true,
+      "expiryDays": 3,
+      "template": "Hi {name}, pay invoice {invoice_no} within 3 days and get a 2% discount! Pay Rs {discounted_amount} instead of Rs {amount}. Offer valid until {expiry_date}."
+    },
+    {
+      "type": "win_back",
+      "inactiveDays": 45,
+      "couponValidDays": 7,
+      "blockedIfOverdueDays": 15,
+      "template": "Hi {name}, we miss you! It's been a while since your last order on {last_order_date}. Use coupon {coupon_code} for a special discount on your next order. Valid until {expiry_date}."
+    }
+  ]
+}
+

@@ -1,0 +1,32 @@
+{
+  "stages": [
+    {
+      "name": "pre_due",
+      "dayOffset": -2,
+      "template": "Hi {name}, this is a friendly reminder that invoice {invoice_no} of Rs {amount} is due in 2 days on {due_date}. Please arrange payment at your earliest convenience."
+    },
+    {
+      "name": "due_day",
+      "dayOffset": 0,
+      "template": "Hi {name}, invoice {invoice_no} of Rs {balance} is due today. Please make the payment to avoid any late charges. Thank you!"
+    },
+    {
+      "name": "soft_followup",
+      "dayOffset": 3,
+      "template": "Hi {name}, we noticed invoice {invoice_no} of Rs {balance} (due {due_date}) is still outstanding. Please pay at your earliest. Let us know if you need help."
+    },
+    {
+      "name": "firm_followup",
+      "dayOffset": 7,
+      "template": "Hi {name}, invoice {invoice_no} of Rs {balance} is now 7 days overdue. Immediate payment is required to avoid disruption to your account. Reply PROMISE <date> if you need a few more days.",
+      "openCase": true
+    },
+    {
+      "name": "final_notice",
+      "dayOffset": 15,
+      "template": "Hi {name}, FINAL NOTICE: invoice {invoice_no} of Rs {balance} is 15 days overdue. We are escalating this to our manager. Please pay immediately or reply DISPUTE if there is an issue.",
+      "escalate": true
+    }
+  ]
+}
+
