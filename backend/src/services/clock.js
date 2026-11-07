@@ -14,8 +14,16 @@ async function getDate() {
  * Returns the current fake date as a YYYY-MM-DD string.
  */
 async function getDateString() {
-  const d = await getDate();
-  return d.toISOString().split('T')[0];
+  const row = await db('clock_state').where({ id: 1 }).first();
+  if (!row) throw new Error('Clock not initialized. Run npm run migrate.');
+  if (typeof row.simulated_date === 'string') {
+    return row.simulated_date.split('T')[0];
+  }
+  const d = new Date(row.simulated_date);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 /**
@@ -31,12 +39,11 @@ async function advance(days, engine) {
     `UPDATE clock_state
      SET simulated_date = simulated_date + ? * INTERVAL '1 day'
      WHERE id = 1
-     RETURNING simulated_date`,
+     RETURNING simulated_date::text`,
     [days]
   );
 
-  const newDate = result.rows[0].simulated_date;
-  const newDateStr = new Date(newDate).toISOString().split('T')[0];
+  const newDateStr = result.rows[0].simulated_date.split('T')[0];
 
   // Trigger the stage engine with the new date
   const summary = await engine.run(newDateStr);
@@ -52,4 +59,3 @@ async function setDate(dateStr) {
 }
 
 module.exports = { getDate, getDateString, advance, setDate };
-

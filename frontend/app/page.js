@@ -29,6 +29,15 @@ function FastForwardIcon({ size = 14, color = 'currentColor' }) {
   );
 }
 
+function RotateCcwIcon({ size = 13, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="1 4 1 10 7 10" />
+      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+    </svg>
+  );
+}
+
 function ShieldIcon({ size = 14, color = 'currentColor' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -79,6 +88,22 @@ function getInitials(name) {
     : name.slice(0, 2).toUpperCase();
 }
 
+function getCustomerScenarioBadge(name) {
+  switch (name) {
+    case 'Ramesh Traders':      return 'Due in 2d & 5d (Pre-due)';
+    case 'Suresh Wholesale':    return 'Due today (Day 0)';
+    case 'Priya Stores':        return '3d overdue (Stage 3)';
+    case 'Mahesh Distributors': return '7d overdue (Stage 4)';
+    case 'Kavita Retail':       return '15d overdue (Stage 5)';
+    case 'Deepak Mart':         return 'Partial (3d overdue)';
+    case 'Sunita Enterprises':  return 'Paid in full';
+    case 'Vinod Supplies':      return '3 overdue invoices';
+    case 'Geeta General Store': return 'Due in 30d & -7d';
+    case 'Harish Wholesale':    return '15d overdue & +10d';
+    default: return null;
+  }
+}
+
 // ── Components ───────────────────────────────────────────────
 
 function CustomerListItem({ customer, selected, onClick }) {
@@ -91,6 +116,7 @@ function CustomerListItem({ customer, selected, onClick }) {
   };
 
   const currentTierStyle = tierStyles[customer.tier] || tierStyles.silver;
+  const scenarioBadge = getCustomerScenarioBadge(customer.name);
 
   return (
     <div
@@ -164,12 +190,31 @@ function CustomerListItem({ customer, selected, onClick }) {
           )}
         </div>
 
+        {/* Lifecycle / Scenario Badge */}
+        {scenarioBadge && (
+          <div style={{
+            marginTop: 4,
+            fontSize: 10,
+            color: '#475569',
+            background: '#f1f5f9',
+            border: '1px solid #e2e8f0',
+            padding: '1px 6px',
+            borderRadius: 4,
+            display: 'inline-block',
+            fontWeight: 500,
+          }}>
+            {scenarioBadge}
+          </div>
+        )}
+
         {customer.stop_messages && (
           <div style={{
             marginTop: 4,
-            fontSize: 11,
+            marginLeft: scenarioBadge ? 4 : 0,
+            fontSize: 10,
             color: '#991b1b',
             background: '#fef2f2',
+            border: '1px solid #fecaca',
             padding: '1px 6px',
             borderRadius: 4,
             display: 'inline-flex',
@@ -177,7 +222,7 @@ function CustomerListItem({ customer, selected, onClick }) {
             gap: 4,
             fontWeight: 500,
           }}>
-            <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#ef4444' }} />
+            <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#ef4444' }} />
             Opted Out
           </div>
         )}
@@ -346,6 +391,28 @@ export default function HomePage() {
     setLoading(false);
   };
 
+  const handleResetSystem = async () => {
+    if (!window.confirm('Reset database and clock to today baseline? This clears message logs and restores the 10 sample customers.')) return;
+    setLoading(true);
+    setStatus('Resetting baseline...');
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const r = await fetch(`${API}/seed/reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ baseDate: today }),
+      });
+      const data = await r.json();
+      setCurrentDate(data.baseDate);
+      setStatus('System reset to baseline');
+      await fetchCustomers();
+      if (selectedId) await fetchMessages(selectedId);
+    } catch (e) {
+      setStatus('Error: ' + e.message);
+    }
+    setLoading(false);
+  };
+
   const handleSendReply = async () => {
     if (!replyText.trim() || !selectedId) return;
     setLoading(true);
@@ -432,7 +499,7 @@ export default function HomePage() {
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 12,
+          gap: 10,
           background: '#f8fafc',
           border: '1px solid #e2e8f0',
           borderRadius: 8,
@@ -489,6 +556,32 @@ export default function HomePage() {
               <FastForwardIcon size={12} color="#ffffff" />
               {loading ? 'Running...' : 'Run Engine'}
             </button>
+
+            {/* Reset to Baseline Button */}
+            <button
+              onClick={handleResetSystem}
+              disabled={loading}
+              title="Reset clock and sample data back to baseline (today)"
+              style={{
+                background: '#ffffff',
+                color: '#475569',
+                border: '1px solid #cbd5e1',
+                padding: '5px 10px',
+                borderRadius: 6,
+                cursor: loading ? 'not-allowed' : 'pointer',
+                fontWeight: 500,
+                fontSize: 12,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#0f172a'; e.currentTarget.style.color = '#0f172a'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.color = '#475569'; }}
+            >
+              <RotateCcwIcon size={12} color="#64748b" />
+              Reset
+            </button>
           </div>
 
           {status && (
@@ -499,7 +592,7 @@ export default function HomePage() {
               padding: '2px 8px',
               borderRadius: 4,
               fontWeight: 500,
-              maxWidth: 240,
+              maxWidth: 220,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -538,7 +631,7 @@ export default function HomePage() {
         
         {/* Customer Directory Sidebar */}
         <aside style={{
-          width: 320,
+          width: 330,
           borderRight: '1px solid #e2e8f0',
           overflowY: 'auto',
           background: '#ffffff',
@@ -647,8 +740,8 @@ export default function HomePage() {
                   }}>
                     <MessageSquareIcon size={32} color="#cbd5e1" />
                     <p style={{ fontWeight: 500, color: '#64748b' }}>No messages in thread</p>
-                    <p style={{ fontSize: 12, color: '#94a3b8' }}>
-                      Advance the simulated clock to trigger scheduled stage messages.
+                    <p style={{ fontSize: 12, color: '#94a3b8', maxWidth: 360, lineHeight: 1.5 }}>
+                      Advance the simulated clock above to trigger scheduled stage messages for this customer.
                     </p>
                   </div>
                 )}

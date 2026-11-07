@@ -4,6 +4,11 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 require('dotenv').config();
 
+const pg = require('pg');
+// Ensure PostgreSQL DATE (OID 1082) is returned as a plain 'YYYY-MM-DD' string
+// to prevent JavaScript Date timezone conversion offsets.
+pg.types.setTypeParser(1082, (val) => val);
+
 const knex = require('knex');
 
 const isTest = process.env.NODE_ENV === 'test';
@@ -25,4 +30,3 @@ const db = knex({
 });
 
 module.exports = db;
-

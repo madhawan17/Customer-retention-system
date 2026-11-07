@@ -15,11 +15,16 @@ function interpolate(template, data) {
 }
 
 function fmtDate(dateStr) {
-  const d = new Date(dateStr);
-  const dd = String(d.getDate()).padStart(2, '0');
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const yyyy = d.getFullYear();
-  return `${dd}-${mm}-${yyyy}`;
+  if (!dateStr) return '';
+  const s = typeof dateStr === 'string'
+    ? dateStr.split('T')[0]
+    : dateStr.toISOString().split('T')[0];
+  const parts = s.split('-');
+  if (parts.length === 3) {
+    const [yyyy, mm, dd] = parts;
+    return `${dd}-${mm}-${yyyy}`;
+  }
+  return s;
 }
 
 function daysDiff(todayStr, dueDateStr) {
@@ -75,9 +80,9 @@ async function run(todayStr) {
   const promiseMap = new Map(
     promises.map(p => [
       p.invoice_id,
-      p.promised_date instanceof Date
-        ? p.promised_date.toISOString().split('T')[0]
-        : String(p.promised_date).split('T')[0],
+      typeof p.promised_date === 'string'
+        ? p.promised_date.split('T')[0]
+        : p.promised_date.toISOString().split('T')[0],
     ])
   );
 
@@ -102,7 +107,11 @@ async function run(todayStr) {
       if (promisedDateStr >= todayStr) continue;
     }
 
-    const diff    = daysDiff(todayStr, invoice.due_date.toISOString().split('T')[0]);
+    const dueDateStr = typeof invoice.due_date === 'string'
+      ? invoice.due_date.split('T')[0]
+      : invoice.due_date.toISOString().split('T')[0];
+
+    const diff    = daysDiff(todayStr, dueDateStr);
     const balance = Number(invoice.amount) - Number(invoice.paid_amount);
 
     let stageToFire = null;
@@ -214,4 +223,3 @@ async function run(todayStr) {
 }
 
 module.exports = { run };
-
