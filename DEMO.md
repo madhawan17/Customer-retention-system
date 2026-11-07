@@ -4,23 +4,29 @@
 
 ---
 
-## Visual Overview
+## Visual Demonstration
 
-### 1. Mock WhatsApp Chat & Follow-up Interface
-![Customer WhatsApp Interface](./docs/assets/01-customer-chat-ui.png)
-*Figure 1: Customer directory with lifecycle badges, simulated clock console, and stage reminders displaying reduced balance after partial payment (`INV-006` showing ₹12,000 remaining).*
+### 1. Mock WhatsApp Chat UI & Payment Follow-Up Engine
 
----
+<img src="docs/assets/01-customer-chat-ui.png" alt="Customer WhatsApp Interface" width="100%" />
 
-### 2. Staff Escalation Panel — Active Cases & Oversight
-![Staff Escalation Panel](./docs/assets/02-staff-escalations.png)
-*Figure 2: Executive oversight dashboard (`/staff`) featuring KPI metrics, overdue firm follow-up cases, case owners (salespersons), and manager escalation tags.*
+*The customer communication portal showing the customer directory with lifecycle status tags, simulated date console (`2026-11-14`), quick reply chips (`PAID`, `DISPUTE`, `STOP`, `YES`, `PROMISE +7d`), and automated follow-up messages showing remaining balance (`INV-006` showing ₹12,000 balance after partial payment).*
 
 ---
 
-### 3. Staff Notifications & Salesperson Alerts
-![Staff Notifications](./docs/assets/03-staff-notifications.png)
-*Figure 3: Real-time alerts generated when invoices escalate to manager, customers dispute charges, or retailers opt out.*
+### 2. Staff Escalation Panel — Active Cases & Escalation Status
+
+<img src="docs/assets/02-staff-escalations.png" alt="Staff Escalation Panel" width="100%" />
+
+*Internal staff dashboard at `/staff` showing real-time KPI metrics (`13 Open Cases`, `13 Escalated Cases`, `26 Unread Alerts`), assigned salesperson case owners (`Anjali`, `Ravi`), and manager escalation tags (`• ESCALATED`).*
+
+---
+
+### 3. Real-Time Staff Alerts & Escalation Notifications
+
+<img src="docs/assets/03-staff-notifications.png" alt="Staff Notifications" width="100%" />
+
+*Notification stream alerting salespeople and managers when cases escalate past 2 simulated days, invoices reach firm follow-up, or customers register disputes, with one-click "Mark as read" functionality.*
 
 ---
 
@@ -39,13 +45,13 @@ Open **http://localhost:3000** in your browser.
 
 ## Step 2: Key UI Controls
 
-- **Top Bar**:
-  - **Simulated Date**: Displays the current fake date stored in PostgreSQL.
+- **Top Navigation Bar**:
+  - **Simulated Date**: Displays current fake date in PostgreSQL.
   - **Advance Clock**: Enter $N$ days and click **Run Engine** to move time forward and execute the stage engine.
-  - **Reset**: One-click baseline reset. Restores the database and fake date to today (`2026-11-07`) with fresh seed data.
+  - **Reset**: Instant baseline reset. Restores the database and clock to today (`2026-11-07`) with fresh seed data.
   - **Staff Panel**: Direct link to the internal staff dashboard at `http://localhost:3000/staff`.
-- **Customer Sidebar**: Displays all 10 customers with tier tags (`GOLD`, `SILVER`, `BRONZE`), total outstanding balance, and their scenario lifecycle badge.
-- **Quick Reply Bar**: One-click chips (`PAID`, `DISPUTE`, `STOP`, `YES`, `PROMISE +7d`) for instant customer reply simulation.
+- **Customer Directory**: Displays all 10 customers with tier badges (`GOLD`, `SILVER`, `BRONZE`), outstanding balances, and their lifecycle scenario tag.
+- **Quick Action Chips**: One-click replies (`PAID`, `DISPUTE`, `STOP`, `YES`, `PROMISE +7d`) for instant customer reply simulation.
 
 ---
 
